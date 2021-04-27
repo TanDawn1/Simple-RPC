@@ -58,6 +58,7 @@
    pojo  简单实体类
    poxy  基于JDK的动态代理的实现
    registry
+    - balancing 负载均衡策略实现
     - deal 方法调用的处理
     - Impl 服务提供者的注册
    serializerType 
