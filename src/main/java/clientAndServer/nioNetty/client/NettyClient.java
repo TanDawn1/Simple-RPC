@@ -42,6 +42,7 @@ public class NettyClient implements RpcClient {
 //                .option(ChannelOption.SO_KEEPALIVE, true);
 //    }
 
+    //TODO 容灾重试策略
     @Override
     public Object sendRequest(RpcRequestFormat rpcRequestFormat) {
         AtomicReference<Object> result = new AtomicReference<>();
@@ -51,14 +52,14 @@ public class NettyClient implements RpcClient {
         }
         try {
             InetSocketAddress inetSocketAddress = iServiceRegistry.lookUpService(rpcRequestFormat.getInterFaceName());
-
+            //获取Channel
             Channel channel = ChannelProvider.get(inetSocketAddress, serializer);
             if(channel == null || !channel.isActive()){
                 logger.error("channel创建失败");
                 return null;
             }
             //ChannelFuture future = bootstrap.connect(host, port).sync();
-            logger.info("连接服务端");
+            logger.info("成功服务端");
             channel.writeAndFlush(rpcRequestFormat).addListener(future1 -> {
                 if(future1.isSuccess()){
                     logger.info(String.format("客户端发送消息：%s", rpcRequestFormat.toString()));

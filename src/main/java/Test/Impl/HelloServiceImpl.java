@@ -9,7 +9,7 @@ public class HelloServiceImpl implements IHelloService {
 
     private static final Logger logger = LoggerFactory.getLogger(HelloServiceImpl.class);
 
-    public String hello(HelloObject helloObject) {
+    public String hello(HelloObject helloObject, int data) {
         logger.info("接收到：{}", helloObject.getMessage());
         return "成功的返回值：id = " + helloObject.getId();
     }

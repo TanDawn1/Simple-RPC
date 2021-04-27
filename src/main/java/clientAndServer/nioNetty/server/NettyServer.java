@@ -82,7 +82,7 @@ public class NettyServer implements RpcServer {
                     });
             //绑定端口号
             ChannelFuture future = serverBootstrap.bind(port).sync();
-            //对关闭通道进行监听
+            //对关闭通道进行监听: 直到channel关闭才退出
             future.channel().closeFuture().sync();
         }catch (Exception e){
             logger.error("发生异常：",e);
@@ -105,6 +105,7 @@ public class NettyServer implements RpcServer {
         iServiceProvider.register(service);
 
         iServiceRegistry.register(serviceClass.getCanonicalName(), new InetSocketAddress(host, port));
+        //测试使用
         start(port);
     }
 

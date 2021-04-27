@@ -23,6 +23,7 @@ public class RpcRequestFormat implements Serializable {
 
     //调用的方法参数
     private Object[] parameters;
+    //因为在序列化的时候，Object[]数组中的数据会序列化失败，所以需要一个方法参数类型辅助序列化
 
     //方法参数类型
     private Class<?>[] paramType;

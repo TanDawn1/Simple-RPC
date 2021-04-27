@@ -11,7 +11,7 @@ public class TestClient {
         RpcClientProxy proxy = new RpcClientProxy(rpcClient);
         IHelloService iHelloService = proxy.getProxy(IHelloService.class);
         HelloObject object = new HelloObject(12, "client message");
-        String res = iHelloService.hello(object);
+        String res = iHelloService.hello(object, 10);
         System.out.println(res);
     }
 

@@ -7,6 +7,7 @@ import com.alibaba.nacos.api.naming.pojo.Instance;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import registry.IServiceRegistry;
+import registry.balancing.IBalancing;
 
 import java.net.InetSocketAddress;
 import java.util.List;
@@ -18,6 +19,16 @@ public class NacosServiceRegistryImpl implements IServiceRegistry {
 
     private static final Logger logger = LoggerFactory.getLogger(NacosServiceRegistryImpl.class);
 
+    //负载均衡策略 默认为随机方式
+    private static int strategy = 0;
+
+    //读取配置文件
+    //TODO
+    static {
+        strategy = 0;
+    }
+
+    //TODO 后序支持自定义
     private static final String SERVER_ADDR = "123.56.160.202:8848";
     private static NamingService namingService = null;
 
@@ -59,9 +70,15 @@ public class NacosServiceRegistryImpl implements IServiceRegistry {
                 logger.error("Nacos异常，instances数目为0");
                 throw new RuntimeException();
             }
-            //负载均衡策略
+            //TODO 负载均衡策略
             //TODO 现在只获取第一个使用，后面可以根据具体情况进行选择
-            Instance instance = instances.get(0);
+            IBalancing iBalancing = IBalancing.getIbancing(strategy);
+            if(iBalancing == null){
+                logger.error("负载均衡配置异常");
+                throw new RuntimeException();
+            }
+            Instance instance = iBalancing.getInstance(instances);
+            //Instance instance = instances.get(0);
             return new InetSocketAddress(instance.getIp(), instance.getPort());
         } catch (NacosException e) {
             logger.info("获取服务时错误:",e);

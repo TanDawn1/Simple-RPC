@@ -2,6 +2,6 @@ package Test;
 
 public interface IHelloService {
 
-    String hello(HelloObject helloObject);
+    String hello(HelloObject helloObject, int data);
 
 }

@@ -29,28 +29,24 @@ public class ChannelProvider {
     private static EventLoopGroup eventLoopGroup;
     private static Bootstrap bootstrap = new Bootstrap();
     //Key: Socket地址+编码方式 Value: Channel
-    private static Map<String, Channel> channels = new ConcurrentHashMap<>();
+    private static final Map<String, Channel> channels = new ConcurrentHashMap<>();
 
     public static Channel get(InetSocketAddress inetSocketAddress, CommonSerializer serializer) throws InterruptedException {
-        //暂时只有一种
+        //通过inet + 序列化方式 唯一标识连接
         String key = inetSocketAddress.toString() + serializer.getCode();
         if (channels.containsKey(key)) {
             Channel channel = channels.get(key);
-            if(channels != null && channel.isActive()) {
+            if(channel.isActive()) {
                 return channel;
             } else {
-                if (channels != null) {
-                    channels.remove(key);
-                }else{
-                    //一般不会走到这块代码，单纯的因为被标黄看起来不舒服加的
-                    logger.info("channels为null");
-                    throw new RuntimeException();
-                }
+                //channels不是活动的
+                channels.remove(key);
             }
         }
+        //没有现存的channel就自己创建新的
         bootstrap.group(new NioEventLoopGroup())
                 .channel(NioSocketChannel.class)
-                //超时时间
+                //超时时间 30s
                 .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, 30000)
                 .handler(new ChannelInitializer<SocketChannel>() {
             @Override
@@ -59,7 +55,7 @@ public class ChannelProvider {
                 // RpcResponse -> ByteBuf
                 ch.pipeline()
                         .addLast(new CommonEncoder(CommonSerializer.getSerializerContainer(serializer.getCode())))
-                        .addLast(new IdleStateHandler(0, 5, 0, TimeUnit.SECONDS))
+                        //.addLast(new IdleStateHandler(0, 5, 0, TimeUnit.SECONDS))
                         .addLast(new CommonDecoder())
                         .addLast(new NettyClientHandler());
             }
@@ -86,6 +82,7 @@ public class ChannelProvider {
                 throw new IllegalStateException();
             }
         });
+        //阻塞等待连接建立
         return completableFuture.get();
     }
 }

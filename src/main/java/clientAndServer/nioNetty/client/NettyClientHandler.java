@@ -1,5 +1,6 @@
 package clientAndServer.nioNetty.client;
 
+import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.util.AttributeKey;
@@ -17,9 +18,11 @@ public class NettyClientHandler extends SimpleChannelInboundHandler<RpcResponse>
         try{
             logger.info(String.format("客户端接收到消息：%s", msg));
             AttributeKey<RpcResponse> key = AttributeKey.valueOf("rpcResponse");
+            Channel channel = ctx.channel();
             ctx.channel().attr(key).set(msg);
             ctx.channel().close();
         }finally {
+            //规范，处理程序需要释放
             ReferenceCountUtil.release(msg);
         }
     }

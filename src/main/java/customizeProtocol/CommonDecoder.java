@@ -2,6 +2,7 @@ package customizeProtocol;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
+import io.netty.handler.codec.ByteToMessageDecoder;
 import io.netty.handler.codec.ReplayingDecoder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,7 +23,7 @@ import java.util.List;
  * |                   Length: ${Data Length}                      |
  * +---------------------------------------------------------------+
  */
-public class CommonDecoder extends ReplayingDecoder {
+public class CommonDecoder extends ByteToMessageDecoder {
 
     private static final Logger logger = LoggerFactory.getLogger(CommonDecoder.class);
 
@@ -31,8 +32,10 @@ public class CommonDecoder extends ReplayingDecoder {
     protected void decode(ChannelHandlerContext ctx, ByteBuf byteBuf, List<Object> list) throws Exception {
         //解码
 //        logger.info("解码数据包:{}",byteBuf);
+        //int占4个字节
         int packageCode = byteBuf.readInt();
         Class<?> packageClass;
+        //标明class的类型
         if(packageCode == PackageType.REQUEST_PACK.code){
             packageClass = RpcRequestFormat.class;
         }else if(packageCode == PackageType.RESPONSE_PACK.code){

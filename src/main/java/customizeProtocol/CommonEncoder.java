@@ -22,7 +22,7 @@ import serializerType.SerializerCode;
  * +---------------------------------------------------------------+
  * 添加了序列化类型和 数据大小防止沾包
  */
-public class CommonEncoder extends MessageToByteEncoder {
+public class CommonEncoder extends MessageToByteEncoder<Object> {
 
     private final CommonSerializer serializer;
 

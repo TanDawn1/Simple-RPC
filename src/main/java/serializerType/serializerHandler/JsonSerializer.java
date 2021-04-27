@@ -36,6 +36,7 @@ public class JsonSerializer implements CommonSerializer {
     @Override
     public Object deSerialized(byte[] bytes, Class<?> clazz) {
         try{
+            System.out.println(new String(bytes));
             Object obj = JSON.parseObject(bytes, clazz);
             if(obj instanceof RpcRequestFormat){
                 obj = handleRequest(obj);
@@ -54,19 +55,23 @@ public class JsonSerializer implements CommonSerializer {
     }
 
     /*
-       这里由于使用JSON序列化和反序列化Object数组，无法保证反序列化后仍然为原实例类型
+       这里由于使用JSON序列化和反序列化Object中的数组，无法保证反序列化后仍然为原实例类型
        需要重新判断处理
     */
     private Object handleRequest(Object obj) throws IOException {
         RpcRequestFormat rpcRequest = (RpcRequestFormat) obj;
+        System.out.println(rpcRequest);
         for(int i = 0; i < rpcRequest.getParameters().length; i ++) {
             Class<?> clazz = rpcRequest.getParamType()[i];
             //判断是否为本身或者父类，不为则说明实例类型出现了问题
+            System.out.println(rpcRequest.getParameters()[i].getClass());
             if(!clazz.isAssignableFrom(rpcRequest.getParameters()[i].getClass())) {
+                //对于参数数据进行反序列化
                 byte[] bytes = JSON.toJSONBytes(rpcRequest.getParameters()[i]);
                 rpcRequest.getParameters()[i] = JSON.parseObject(bytes, clazz);
             }
         }
+        System.out.println(rpcRequest);
         return rpcRequest;
     }
 

@@ -6,6 +6,7 @@ import pojo.RpcRequestFormat;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.Arrays;
 
 /**
  * 通过反射进行方法调用
@@ -18,6 +19,7 @@ public class RequestHandler {
         Object res = null;
         try{
             res = invokeTargetMethod(rpcRequestFormat, service);
+            if(res == null) throw new RuntimeException();
             logger.info("服务：{} 方法调用成功：{}", rpcRequestFormat.getInterFaceName(), rpcRequestFormat.getMethodName());
         }catch (Exception e){
             logger.error("调用时发生错误：",e);
@@ -29,10 +31,12 @@ public class RequestHandler {
         Method method = null;
         try{
             method = service.getClass().getMethod(rpcRequestFormat.getMethodName(), rpcRequestFormat.getParamType());
+            return method.invoke(service, rpcRequestFormat.getParameters());
         }catch (Exception e){
             logger.error("发生错误，方法调用失败",e);
         }
-        return method.invoke(service, rpcRequestFormat.getParameters());
+        //System.out.println(rpcRequestFormat.getParameters());
+        return null;
     }
 
 }

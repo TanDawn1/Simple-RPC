@@ -12,7 +12,7 @@ public class NettyTestClient {
         RpcClientProxy rpcClientProxy = new RpcClientProxy(client);
         IHelloService helloService = rpcClientProxy.getProxy(IHelloService.class);
         HelloObject helloObject = new HelloObject(12,"This is a message");
-        String res = helloService.hello(helloObject);
+        String res = helloService.hello(helloObject, 10);
         System.out.println(res);
     }
 
